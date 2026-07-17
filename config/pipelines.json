@@ -1,0 +1,9 @@
+[
+    {
+        "id": 1,
+        "name": "Default",
+        "enabled": true,
+        "source_chat_id": 5398575790,
+        "target_chat_id": 5452697300
+    }
+]
