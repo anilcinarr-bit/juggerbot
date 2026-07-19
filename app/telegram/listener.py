@@ -1,7 +1,7 @@
 import logging
 from telethon import events
 
-from app.telegram.client import client
+from app.telegram.client import get_telegram_client
 from app.telegram.handlers import handle_new_message
 
 logger = logging.getLogger("telegram.listener")
@@ -10,6 +10,9 @@ logger = logging.getLogger("telegram.listener")
 def register_listeners() -> None:
     """Register Telegram event listeners"""
     logger.info("Registering Telegram event listeners...")
+    
+    # Get the client instance
+    client = get_telegram_client()
     
     # Register handler for new messages
     @client.on(events.NewMessage())

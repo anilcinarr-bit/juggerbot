@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 
 from app.models.incoming_message import IncomingMessage
-from app.telegram.client import client
+from app.telegram.client import get_telegram_client
 
 logger = logging.getLogger("pipeline.telegram_sender")
 
@@ -22,6 +22,9 @@ class TelegramSender:
             bool: True if successful, False otherwise
         """
         try:
+            # Get the client instance
+            client = get_telegram_client()
+            
             # Send the message to the target chat using the shared client
             await client.send_message(
                 entity=target_chat_id,

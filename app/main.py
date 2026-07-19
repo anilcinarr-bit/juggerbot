@@ -1,6 +1,17 @@
+import sys
 import asyncio
 import logging
 from typing import Dict
+
+# Set the correct event loop policy for Windows BEFORE any other imports
+if sys.platform == "win32":
+    try:
+        # This is the correct approach - ensure we use ProactorEventLoop which supports subprocess
+        asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+        print("WindowsProactorEventLoopPolicy set successfully")
+    except NotImplementedError:
+        # Fallback if WindowsProactorEventLoopPolicy is not available
+        pass
 
 from fastapi import FastAPI
 
@@ -10,6 +21,11 @@ from app.telegram.client import connect_client, disconnect_client
 from app.telegram.listener import start_listeners, stop_listeners
 from app.config import settings
 from app.core.logging import logger
+from app.browser.browser_manager import BrowserManager
+from app.browser.exceptions import BrowserUnavailable
+
+# Create singleton instance of BrowserManager
+browser_manager = BrowserManager()
 
 app = FastAPI(
     title=settings.app_name,
@@ -26,6 +42,17 @@ app.include_router(routes_moderation.router)
 @app.on_event("startup")
 async def on_startup() -> None:
     await init_db()
+    # Start the browser manager (with graceful error handling)
+    try:
+        await browser_manager.start()
+        logger.info("Browser manager started successfully")
+    except Exception as e:
+        logger.warning(f"Browser manager failed to start: {e}. Continuing without browser functionality.")
+        # Don't let browser issues prevent the application from starting
+        # The browser is now optional - we'll set a flag to indicate it's not available
+        # This will be used by other services that may check if browser is available
+        # In case of error, we still want the app to start properly
+        pass  # Continue with startup even if browser fails
     # Connect to Telegram client
     await connect_client()
     # Start Telegram listeners
@@ -38,6 +65,11 @@ async def on_shutdown() -> None:
     await stop_listeners()
     # Disconnect from Telegram client
     await disconnect_client()
+    # Stop the browser manager
+    try:
+        await browser_manager.stop()
+    except Exception as e:
+        logger.error(f"Error stopping browser manager: {e}")
 
 
 @app.get("/")

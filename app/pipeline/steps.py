@@ -1,6 +1,7 @@
 import logging
 from app.models.incoming_message import IncomingMessage
-from app.pipeline.forward_engine import ForwardEngine
+from app.automation.engine import AutomationEngine
+from app.adapters.hepsiburada import HepsiburadaAdapter
 
 logger = logging.getLogger("pipeline.steps")
 
@@ -22,7 +23,9 @@ async def logger_step(message: IncomingMessage) -> None:
 
 
 async def forward_engine_step(message: IncomingMessage) -> None:
-    """Forward Engine step that processes the message through ForwardEngine"""
-    # Create and use ForwardEngine instance
-    forward_engine = ForwardEngine()
-    await forward_engine.process(message)
+    """Forward Engine step that processes the message through AutomationEngine"""
+    # Create and use AutomationEngine instance
+    automation_engine = AutomationEngine()
+    
+    # Execute the automation engine which will create and execute HepsiburadaAdapter
+    await automation_engine.execute(message)
