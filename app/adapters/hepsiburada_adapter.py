@@ -5,6 +5,7 @@ from playwright.async_api import Page, TimeoutError
 from app.adapters.base import BaseAdapter
 from app.browser.browser_manager import BrowserManager
 from app.platforms.hepsiburada import HOME_URL, CHECKOUT_URL, COUPON_INPUT_SELECTOR, APPLY_BUTTON_SELECTOR, RESULT_SELECTOR
+from app.models.coupon_result import classify_hepsiburada_result, CouponStatus
 
 logger = logging.getLogger("adapters.hepsiburada")
 
@@ -209,32 +210,57 @@ class HepsiburadaAdapter(BaseAdapter):
                             "status": "invalid"
                         }
                     else:
-                        # Unrecognized toast result - preserve as submitted_unverified
-                        logger.info("Unrecognized Hepsiburada coupon result; leaving as submitted_unverified")
-                        return {
-                            "success": False,
-                            "message": toast_text,
-                            "coupon": coupon,
-                            "status": "submitted_unverified"
-                        }
+                        # Unrecognized toast result - classify it using our new system
+                        logger.info("Unrecognized Hepsiburada coupon result; classifying with new system")
+                        classified_status = classify_hepsiburada_result(toast_text)
+                        logger.info(f"[Hepsiburada] Raw result: \"{toast_text}\"")
+                        logger.info(f"[Hepsiburada] Classification: {classified_status.value}")
+                        
+                        # Return the properly classified result
+                        if classified_status == CouponStatus.SUCCESS:
+                            return {
+                                "success": True,
+                                "message": toast_text,
+                                "coupon": coupon,
+                                "status": "success"
+                            }
+                        elif classified_status in [CouponStatus.INVALID, CouponStatus.ALREADY_USED, 
+                                                  CouponStatus.EXPIRED, CouponStatus.MIN_CART]:
+                            return {
+                                "success": False,
+                                "message": toast_text,
+                                "coupon": coupon,
+                                "status": classified_status.value.lower()
+                            }
+                        else:
+                            # For unknown cases, return UNKNOWN status
+                            logger.info("Unknown classification result; returning UNKNOWN")
+                            return {
+                                "success": False,
+                                "message": toast_text,
+                                "coupon": coupon,
+                                "status": "unknown"
+                            }
                 else:
                     # Toast exists but is not visible - treat as no result detected
                     logger.info("No recognized Hepsiburada result detected after submission")
+                    # Return UNKNOWN status for cases with no visible message
                     return {
                         "success": False,
-                        "message": "Coupon submitted for processing",
+                        "message": "No visible message after submission",
                         "coupon": coupon,
-                        "status": "submitted_unverified"
+                        "status": "unknown"
                     }
                     
             except Exception:
                 # No toast appeared within timeout - treat as no result detected
                 logger.info("No recognized Hepsiburada result detected after submission")
+                # Return UNKNOWN status for cases with no visible message
                 return {
                     "success": False,
-                    "message": "Coupon submitted for processing",
+                    "message": "No visible message after submission",
                     "coupon": coupon,
-                    "status": "submitted_unverified"
+                    "status": "unknown"
                 }
                 
         except Exception as e:
