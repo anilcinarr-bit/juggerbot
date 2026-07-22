@@ -1,12 +1,10 @@
 import logging
-import asyncio
-import sys
-import os
-from typing import Optional, Dict
+from typing import Optional
 from playwright.async_api import async_playwright, Playwright, Browser, BrowserContext, Page
 
-from app.browser.exceptions import BrowserUnavailable
-from app.config import settings
+from app.browser.exceptions import BrowserUnavailable, BrowserNotConfigured
+from app.browser.browser_config import load_browser_config
+from app.browser.browser_discovery import discover_browsers
 
 logger = logging.getLogger("browser.browser_manager")
 
@@ -15,7 +13,6 @@ class BrowserManager:
     """Manages browser lifecycle using Playwright - Singleton pattern"""
     
     _instance: Optional['BrowserManager'] = None
-    _initialized: bool = False
     
     def __new__(cls) -> 'BrowserManager':
         if cls._instance is None:
@@ -24,11 +21,10 @@ class BrowserManager:
     
     def __init__(self):
         """Initialize BrowserManager with singleton pattern"""
-        if not self._initialized:
+        if not hasattr(self, '_initialized'):
             self._playwright: Optional[Playwright] = None
             self._browser: Optional[Browser] = None
             self._persistent_context: Optional[BrowserContext] = None
-            self._page: Optional[Page] = None
             self._available: bool = False
             self._initialized = True
     
@@ -85,56 +81,49 @@ class BrowserManager:
         logger.info("Browser starting...")
         
         try:
-            # Debug: Print event loop information before Playwright initialization
-            current_loop = asyncio.get_running_loop()
-            current_policy = asyncio.get_event_loop_policy()
-            logger.info(f"Before Playwright - Loop: {type(current_loop)}, Policy: {type(current_policy)}")
-            
-            # For Windows systems, we need to ensure Playwright works properly with subprocesses.
-            # The fundamental problem is that Uvicorn/asyncio creates a selector loop in the main thread
-            # and then Playwright tries to use subprocesses which only work with ProactorEventLoop.
-            # 
-            # Since this is a known limitation of Windows, we have two options:
-            # 1. We can accept that browser functionality is not available on Windows (not ideal)
-            # 2. Or we modify the approach to try to make it work
-            #
-            # Since we're required to make it work and not disable Playwright or make browser optional,
-            # let's try to make a better attempt at ensuring the right event loop context
-            
-            if sys.platform == "win32":
-                logger.info("Windows detected - attempting to ensure subprocess compatibility for Playwright")
-                
-                # Since we can't easily control the event loop in this async context, 
-                # and this is a known Windows limitation with Uvicorn/asyncio,
-                # let's implement a workaround that catches the specific error and
-                # tries to provide better feedback.
-                
-                # The approach: try to start with our current loop, and if it fails with NotImplementedError,
-                # we log it but continue (since we're not supposed to make browser optional)
-                pass
-            
             # Initialize Playwright - this may fail on Windows due to event loop issues
             self._playwright = await async_playwright().start()
             
-            # Create the profiles directory structure for documentation purposes only
-            profiles_dir = os.path.join(os.getcwd(), "profiles")
-            os.makedirs(profiles_dir, exist_ok=True)
+            # Load configuration
+            config = load_browser_config()
+            logger.info(f"Selected browser: {config.selected_browser}")
+            logger.info(f"Selected profile: {config.selected_profile}")
             
-            # Launch Chromium browser with persistent context - this is the key fix
+            # Check if browser/profile are configured
+            if config.selected_browser is None or config.selected_profile is None:
+                raise BrowserNotConfigured("No browser/profile has been configured yet.")
+            
+            # Discover browsers
+            browsers = discover_browsers()
+            
+            # Find the configured browser
+            selected_browser = None
+            for browser in browsers:
+                if browser["browser"] == config.selected_browser and browser["installed"]:
+                    selected_browser = browser
+                    break
+            
+            if not selected_browser:
+                raise FileNotFoundError(f"Configured browser '{config.selected_browser}' not found. Please install the browser or update your configuration.")
+            
+            # Validate profile exists
+            if config.selected_profile and config.selected_profile not in selected_browser["profiles"]:
+                raise FileNotFoundError(f"Configured profile '{config.selected_profile}' not found for browser '{config.selected_browser}'.")
+            
+            # Launch browser with persistent context using configuration
             logger.info("Loading browser with persistent context...")
+            logger.info(f"Resolved executable_path: {selected_browser['executable']}")
+            logger.info(f"Resolved user_data_dir: {selected_browser['user_data']}")
             
-            self._browser = await self._playwright.chromium.launch(
+            self._persistent_context = await self._playwright.chromium.launch_persistent_context(
+                executable_path=selected_browser["executable"],
+                user_data_dir=selected_browser["user_data"],
                 headless=False,  # Run in headed mode for development
                 timeout=30000    # 30 second timeout
             )
             
-            # Create ONE persistent context for all platforms (this is the key fix)
-            self._persistent_context = await self._browser.new_context(
-                viewport={"width": 1280, "height": 720}
-            )
-            
-            # Create default page
-            self._page = await self._persistent_context.new_page()
+            # Set the browser instance from the persistent context
+            self._browser = self._persistent_context.browser
             
             self._available = True
             logger.info("Browser started successfully with persistent context.")
@@ -170,11 +159,6 @@ class BrowserManager:
                 await self._persistent_context.close()
                 self._persistent_context = None
             
-            # Close page
-            if self._page:
-                await self._page.close()
-                self._page = None
-                
             # Close browser
             if self._browser:
                 await self._browser.close()
@@ -190,7 +174,6 @@ class BrowserManager:
         except Exception as e:
             logger.error(f"Error closing browser: {e}")
             raise
-
 
 
 

@@ -78,3 +78,6 @@ class AdapterRouter:
         except Exception as e:
             logger.error(f"Error executing automation for platform {platform}: {e}")
             raise
+
+# Create a singleton instance to match the import pattern used elsewhere in the project
+adapter_router = AdapterRouter()

@@ -1,10 +1,10 @@
 import logging
 from typing import Dict, Any
-from playwright.async_api import Page
+from playwright.async_api import Page, TimeoutError
 
 from app.adapters.base import BaseAdapter
 from app.browser.browser_manager import BrowserManager
-from app.platforms.hepsiburada import HOME_URL, COUPON_PAGE_URL, COUPON_INPUT_SELECTOR, APPLY_BUTTON_SELECTOR, RESULT_SELECTOR
+from app.platforms.hepsiburada import HOME_URL, CHECKOUT_URL, COUPON_INPUT_SELECTOR, APPLY_BUTTON_SELECTOR, RESULT_SELECTOR
 
 logger = logging.getLogger("adapters.hepsiburada")
 
@@ -27,101 +27,214 @@ class HepsiburadaAdapter(BaseAdapter):
             # Create a new page from the persistent context (this is the key fix)
             page = await browser_manager.new_page()
             
-            # Navigate to Hepsiburada website
-            logger.info("Opening Hepsiburada...")
-            await page.goto(HOME_URL, timeout=30000)
+            # Navigate directly to the cart page for coupon redemption
+            logger.info("Navigating to Hepsiburada cart")
+            await page.goto("https://checkout.hepsiburada.com/sepetim", wait_until="domcontentloaded", timeout=30000)
+            logger.info("Hepsiburada cart loaded")
             
-            # Wait for page to load
-            await page.wait_for_load_state("networkidle")
+            # Find and click the "Kupon kodu ekle" control
+            logger.info("Opening coupon drawer")
+            try:
+                # Try the preferred locator first
+                await page.get_by_label("Kupon kodu ekle").click(timeout=10000)
+            except TimeoutError:
+                # Fallback to text-based locator if needed
+                await page.get_by_text("Kupon kodu ekle", exact=True).click(timeout=10000)
+            logger.info("Coupon drawer opened")
             
-            # Navigate to coupon redemption page
-            logger.info("Navigating to coupon page...")
-            await page.goto(COUPON_PAGE_URL, timeout=30000)
+            # Find visible coupon input directly (without relying on BasketCoupons container)
+            logger.info("Finding visible coupon input")
+            coupon_inputs = page.get_by_placeholder("Kupon kodunuzu girin")
+            visible_coupon_inputs = await coupon_inputs.all()  # Get all matching elements
             
-            # Wait for coupon page to load
-            await page.wait_for_load_state("networkidle")
+            # Log diagnostic information
+            total_inputs = len(visible_coupon_inputs)
+            visible_count = sum([await inp.is_visible() for inp in visible_coupon_inputs])
+            logger.info(f"Total coupon inputs found: {total_inputs}")
+            logger.info(f"Visible coupon inputs found: {visible_count}")
             
-            # Find the coupon input field
-            logger.info("Finding coupon input field...")
-            coupon_input = await page.wait_for_selector(
-                COUPON_INPUT_SELECTOR,
-                timeout=10000
-            )
+            # Find the first visible input
+            visible_input = None
+            for inp in visible_coupon_inputs:
+                is_visible = await inp.is_visible()
+                if is_visible:
+                    visible_input = inp
+                    break
+            
+            if not visible_input:
+                # If no visible input found, wait for one to appear
+                try:
+                    # Wait for at least one coupon input to be visible
+                    await page.wait_for_selector('input[placeholder="Kupon kodunuzu girin"]', state='visible', timeout=10000)
+                    # Get the first visible one now
+                    visible_coupon_inputs = await page.get_by_placeholder("Kupon kodunuzu girin").all()
+                    visible_count = sum([await inp.is_visible() for inp in visible_coupon_inputs])
+                    logger.info(f"Total coupon inputs found after wait: {len(visible_coupon_inputs)}")
+                    logger.info(f"Visible coupon inputs found after wait: {visible_count}")
+                    for inp in visible_coupon_inputs:
+                        if await inp.is_visible():
+                            visible_input = inp
+                            break
+                except TimeoutError:
+                    logger.error("No visible coupon input found after waiting")
+                    raise
+            
+            if not visible_input:
+                logger.error("No visible coupon input found")
+                return {
+                    "success": False,
+                    "message": "Coupon input not found",
+                    "coupon": coupon,
+                    "status": "error"
+                }
+            
+            logger.info("Coupon input found")
             
             # Fill the coupon code
-            logger.info(f"Entering coupon code: {coupon}")
-            await coupon_input.fill(coupon)
+            await visible_input.fill(coupon)
+            logger.info("Coupon code filled")
             
-            # Find and click the apply button
-            logger.info("Applying coupon...")
-            apply_button = await page.wait_for_selector(
-                APPLY_BUTTON_SELECTOR,
-                timeout=10000
-            )
-            await apply_button.click()
+            # Find the "Ekle" button associated with this visible input
+            # We'll locate it by finding all Ekle buttons and then checking which one is visible and related to the input
+            logger.info("Finding associated 'Ekle' button")
+            ekle_buttons = page.get_by_role("button", name="Ekle", exact=True)
+            visible_ekle_buttons = await ekle_buttons.all()
             
-            # Wait for result to appear
-            logger.info("Waiting for result...")
-            await page.wait_for_timeout(2000)  # Give time for the result to show
+            # Log diagnostic information for buttons
+            total_buttons = len(visible_ekle_buttons)
+            visible_button_count = sum([await btn.is_visible() for btn in visible_ekle_buttons])
+            logger.info(f"Total exact Ekle buttons found: {total_buttons}")
+            logger.info(f"Visible exact Ekle buttons found: {visible_button_count}")
             
-            # Check if coupon was applied successfully
-            success_message = await page.query_selector(RESULT_SELECTOR)
-            error_message = await page.query_selector(RESULT_SELECTOR)
+            # Try to find the button associated with this specific input
+            add_button = None
             
-            # Determine result based on message presence
-            if success_message:
-                logger.info("Coupon applied successfully!")
-                return {
-                    "success": True,
-                    "message": "Coupon applied successfully",
-                    "coupon": coupon,
-                    "status": "applied"
-                }
-            elif error_message:
-                error_text = await error_message.inner_text()
-                logger.warning(f"Coupon application failed: {error_text}")
+            # If there's exactly one visible button, use it
+            if visible_button_count == 1:
+                for btn in visible_ekle_buttons:
+                    if await btn.is_visible():
+                        add_button = btn
+                        break
+            elif visible_button_count > 1:
+                # Try to find a DOM relationship between input and buttons
+                try:
+                    # Get the parent container of the coupon input
+                    input_parent = await visible_input.locator('xpath=..').first
+                    if input_parent:
+                        # Look for Ekle buttons within this parent
+                        parent_ekle_buttons = input_parent.get_by_role("button", name="Ekle", exact=True)
+                        parent_visible_buttons = await parent_ekle_buttons.all()
+                        
+                        # Check which of these are visible
+                        for btn in parent_visible_buttons:
+                            if await btn.is_visible():
+                                add_button = btn
+                                break
+                except Exception as e:
+                    logger.debug(f"Could not establish DOM relationship: {e}")
                 
-                # Check for specific error types
-                if "zaten kullanıldı" in error_text.lower() or "already used" in error_text.lower():
+                # If we still haven't found a button, it's ambiguous - return error
+                if not add_button:
+                    logger.error("Multiple visible Ekle buttons found but no clear DOM relationship to input")
                     return {
                         "success": False,
-                        "message": "Coupon already used",
-                        "coupon": coupon,
-                        "status": "already_used"
-                    }
-                elif "geçersiz kupon" in error_text.lower() or "invalid coupon" in error_text.lower():
-                    return {
-                        "success": False,
-                        "message": "Invalid coupon",
-                        "coupon": coupon,
-                        "status": "invalid"
-                    }
-                elif "süresi dolmuş" in error_text.lower() or "expired" in error_text.lower():
-                    return {
-                        "success": False,
-                        "message": "Coupon expired",
-                        "coupon": coupon,
-                        "status": "expired"
-                    }
-                else:
-                    return {
-                        "success": False,
-                        "message": f"Error applying coupon: {error_text}",
+                        "message": "Ambiguous Ekle button selection",
                         "coupon": coupon,
                         "status": "error"
                     }
             else:
-                # Check for login required message
-                # Note: We don't have a specific selector for this in platform definitions
-                # so we'll rely on error handling instead
-                
-                # If no specific message found, assume success
-                logger.info("Coupon applied successfully (no error messages)")
+                # No visible buttons found
+                logger.error("No visible 'Ekle' button found")
                 return {
-                    "success": True,
-                    "message": "Coupon applied successfully",
+                    "success": False,
+                    "message": "Add button not found",
                     "coupon": coupon,
-                    "status": "applied"
+                    "status": "error"
+                }
+            
+            # Wait for the "Ekle" button to become enabled
+            # Use polling approach since wait_for with "enabled" state is not supported
+            import asyncio
+            start_time = asyncio.get_event_loop().time()
+            timeout_seconds = 10
+            button_enabled = False
+            
+            while not button_enabled and (asyncio.get_event_loop().time() - start_time) < timeout_seconds:
+                try:
+                    button_enabled = await add_button.is_enabled()
+                    if not button_enabled:
+                        # Wait a short time before checking again
+                        await asyncio.sleep(0.1)
+                except Exception as e:
+                    logger.debug(f"Error checking button enabled state: {e}")
+                    # If there's an error checking, continue trying
+                    await asyncio.sleep(0.1)
+            
+            if not button_enabled:
+                logger.error("Ekle button did not become enabled within 10 seconds")
+                return {
+                    "success": False,
+                    "message": "Ekle button did not become enabled",
+                    "coupon": coupon,
+                    "status": "error"
+                }
+                
+            logger.info("Add button enabled")
+            
+            # Click the "Ekle" button
+            await add_button.click()
+            logger.info("Coupon submitted")
+            
+            # Wait for Hepsiburada result toast
+            logger.info("Waiting for Hepsiburada coupon result")
+            try:
+                # Use Playwright's wait_for with visible timeout to detect toast
+                toast = page.locator('.hb-toast-notifier-container').first
+                await toast.wait_for(timeout=5000)  # Wait up to 5 seconds for toast
+                
+                if await toast.is_visible():
+                    toast_text = await toast.inner_text()
+                    logger.info(f"Hepsiburada coupon result: {toast_text}")
+                    
+                    # Normalize text for classification (lowercase, trim whitespace)
+                    normalized_text = toast_text.strip().lower()
+                    
+                    # Check for verified invalid response
+                    if "geçersiz bir kod girdin" in normalized_text:
+                        logger.info("Coupon result classified as invalid")
+                        return {
+                            "success": False,
+                            "message": toast_text,
+                            "coupon": coupon,
+                            "status": "invalid"
+                        }
+                    else:
+                        # Unrecognized toast result - preserve as submitted_unverified
+                        logger.info("Unrecognized Hepsiburada coupon result; leaving as submitted_unverified")
+                        return {
+                            "success": False,
+                            "message": toast_text,
+                            "coupon": coupon,
+                            "status": "submitted_unverified"
+                        }
+                else:
+                    # Toast exists but is not visible - treat as no result detected
+                    logger.info("No recognized Hepsiburada result detected after submission")
+                    return {
+                        "success": False,
+                        "message": "Coupon submitted for processing",
+                        "coupon": coupon,
+                        "status": "submitted_unverified"
+                    }
+                    
+            except Exception:
+                # No toast appeared within timeout - treat as no result detected
+                logger.info("No recognized Hepsiburada result detected after submission")
+                return {
+                    "success": False,
+                    "message": "Coupon submitted for processing",
+                    "coupon": coupon,
+                    "status": "submitted_unverified"
                 }
                 
         except Exception as e:

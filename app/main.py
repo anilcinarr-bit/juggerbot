@@ -3,16 +3,6 @@ import asyncio
 import logging
 from typing import Dict
 
-# Set the correct event loop policy for Windows BEFORE any other imports
-if sys.platform == "win32":
-    try:
-        # This is the correct approach - ensure we use ProactorEventLoop which supports subprocess
-        asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
-        print("WindowsProactorEventLoopPolicy set successfully")
-    except NotImplementedError:
-        # Fallback if WindowsProactorEventLoopPolicy is not available
-        pass
-
 from fastapi import FastAPI
 
 from app.api import routes_moderation, routes_rules, routes_sources, routes_targets
@@ -53,9 +43,9 @@ async def on_startup() -> None:
         # This will be used by other services that may check if browser is available
         # In case of error, we still want the app to start properly
         pass  # Continue with startup even if browser fails
-    # Connect to Telegram client
+    
+    # Connect to Telegram client and start listeners
     await connect_client()
-    # Start Telegram listeners
     await start_listeners()
 
 
