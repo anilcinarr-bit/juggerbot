@@ -14,8 +14,8 @@ CHECKOUT_URL = None
 
 # Selectors
 COUPON_PANEL_SELECTOR = "#coupon-panel"
-COUPON_INPUT_SELECTOR = "#coupon-input"
-APPLY_BUTTON_SELECTOR = "#apply-coupon-button"
+COUPON_INPUT_SELECTOR = "input[placeholder='İndirim kodu girin']"  # Based on inspection results
+APPLY_BUTTON_SELECTOR = ".basket-top-coupon-action-button"  # From the inspection results
 RESULT_SELECTOR = ".coupon-result-message"
 LOGIN_INDICATOR_SELECTOR = ".user-menu"
 USER_MENU_SELECTOR = ".user-menu"
