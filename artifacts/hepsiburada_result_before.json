@@ -1,0 +1,81 @@
+[
+  {
+    "selector": "[aria-live]",
+    "tag": "div",
+    "class": "basket_container_1VEW_ basket_container_new_pw0ng",
+    "aria_live": "polite",
+    "text": "Kuponlarım (1)\nKupon kodu ekle\n150 TL\nAlt Limit: 800 TL\nKaldır\nGiyim ürünlerinde 800 TL ve üzeri alışverişe 150 TL indirim.\nDetaylar\nKuponlarım\nEkle\nTanımlı indirim kodları\n150 TL\nAlt Limit: 800 TL\nKaldır\nGiyim ürünlerinde 800 TL ve üzeri alışverişe 150 TL indirim.\nDetaylar\nSatıcı:\nGrımelange\nKargon",
+    "visible": true,
+    "is_enabled": true
+  },
+  {
+    "selector": "[class*=\"coupon\"]",
+    "tag": "div",
+    "class": "coupons_area_2bduz",
+    "text": "Kuponlarım (1)\nKupon kodu ekle\n150 TL\nAlt Limit: 800 TL\nKaldır\nGiyim ürünlerinde 800 TL ve üzeri alışverişe 150 TL indirim.\nDetaylar\nKuponlarım\nEkle\nTanımlı indirim kodları\n150 TL\nAlt Limit: 800 TL\nKaldır\nGiyim ürünlerinde 800 TL ve üzeri alışverişe 150 TL indirim.\nDetaylar",
+    "visible": true,
+    "is_enabled": true
+  },
+  {
+    "selector": "[class*=\"coupon\"]",
+    "tag": "div",
+    "class": "coupons_wrapper_1FSk6",
+    "text": "Kuponlarım (1)\nKupon kodu ekle",
+    "visible": true,
+    "is_enabled": true
+  },
+  {
+    "selector": "[class*=\"coupon\"]",
+    "tag": "span",
+    "class": "my_coupons_title_1zQki",
+    "text": "Kuponlarım (1)",
+    "visible": true,
+    "is_enabled": true
+  },
+  {
+    "selector": "[class*=\"coupon\"]",
+    "tag": "div",
+    "class": "add_coupon_code_button_22a1C",
+    "text": "Kupon kodu ekle",
+    "visible": true,
+    "is_enabled": true
+  },
+  {
+    "selector": "[class*=\"coupon\"]",
+    "tag": "div",
+    "class": "coupon_item_1YloP",
+    "text": "150 TL\nAlt Limit: 800 TL\nKaldır\nGiyim ürünlerinde 800 TL ve üzeri alışverişe 150 TL indirim.\nDetaylar",
+    "visible": true,
+    "is_enabled": true
+  },
+  {
+    "selector": "[class*=\"coupon\"]",
+    "tag": "div",
+    "class": "couponCardBasketContainer_2yspa \n  false\n  used_3LlFJ \n  false\n  ",
+    "text": "150 TL\nAlt Limit: 800 TL\nKaldır\nGiyim ürünlerinde 800 TL ve üzeri alışverişe 150 TL indirim.\nDetaylar",
+    "visible": true,
+    "is_enabled": true
+  },
+  {
+    "selector": "[class*=\"coupon\"]",
+    "tag": "div",
+    "class": "couponOverlay_1C410",
+    "visible": true,
+    "is_enabled": true
+  },
+  {
+    "selector": "[class*=\"coupon\"]",
+    "tag": "div",
+    "class": "couponCardBasket_yI8FG",
+    "text": "150 TL\nAlt Limit: 800 TL\nKaldır\nGiyim ürünlerinde 800 TL ve üzeri alışverişe 150 TL indirim.\nDetaylar",
+    "visible": true,
+    "is_enabled": true
+  },
+  {
+    "selector": "[class*=\"coupon\"]",
+    "tag": "div",
+    "class": "couponSplitter_3UMdJ",
+    "visible": true,
+    "is_enabled": true
+  }
+]

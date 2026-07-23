@@ -1,0 +1,895 @@
+{
+  "coupon_input": null,
+  "apply_button": {
+    "index": 3,
+    "text": "Ürün Ekle & Uygula",
+    "id": "",
+    "class": "basket-top-coupon-action-button",
+    "aria-label": "",
+    "parent_classes": "right-wrapper-bottom"
+  },
+  "open_button": {
+    "index": 63,
+    "text": "İndirim Kodu Gir",
+    "id": "",
+    "class": "use-promotion-code-button",
+    "aria-label": "",
+    "parent_classes": ""
+  },
+  "all_inputs": [
+    {
+      "index": 0,
+      "tag": "input",
+      "type": "checkbox",
+      "placeholder": "",
+      "name": "",
+      "id": "checkbox-",
+      "class": "",
+      "aria-label": "Tüm ürünleri seçmeyi kaldır",
+      "parent_classes": ""
+    },
+    {
+      "index": 1,
+      "tag": "input",
+      "type": "checkbox",
+      "placeholder": "",
+      "name": "",
+      "id": "checkbox-",
+      "class": "",
+      "aria-label": "Ürünü seçmeyi kaldır",
+      "parent_classes": ""
+    },
+    {
+      "index": 2,
+      "tag": "input",
+      "type": "text",
+      "placeholder": "",
+      "name": "",
+      "id": "",
+      "class": "quantity-selector",
+      "aria-label": "Ürün adedi",
+      "parent_classes": "quantity-selector-wrapper"
+    },
+    {
+      "index": 3,
+      "tag": "input",
+      "type": "checkbox",
+      "placeholder": "",
+      "name": "ot-group-id-C0002",
+      "id": "ot-group-id-C0002",
+      "class": "category-switch-handler",
+      "aria-label": "",
+      "parent_classes": "ot-tgl"
+    },
+    {
+      "index": 4,
+      "tag": "input",
+      "type": "checkbox",
+      "placeholder": "",
+      "name": "ot-group-id-C0004",
+      "id": "ot-group-id-C0004",
+      "class": "category-switch-handler",
+      "aria-label": "",
+      "parent_classes": "ot-tgl"
+    },
+    {
+      "index": 5,
+      "tag": "input",
+      "type": "checkbox",
+      "placeholder": "",
+      "name": "ot-group-id-C0003",
+      "id": "ot-group-id-C0003",
+      "class": "category-switch-handler",
+      "aria-label": "",
+      "parent_classes": "ot-tgl"
+    },
+    {
+      "index": 6,
+      "tag": "input",
+      "type": "checkbox",
+      "placeholder": "",
+      "name": "ot-group-id-C0005",
+      "id": "ot-group-id-C0005",
+      "class": "category-switch-handler",
+      "aria-label": "",
+      "parent_classes": "ot-tgl"
+    },
+    {
+      "index": 7,
+      "tag": "input",
+      "type": "checkbox",
+      "placeholder": "",
+      "name": "ot-group-id-C0007",
+      "id": "ot-group-id-C0007",
+      "class": "category-switch-handler",
+      "aria-label": "",
+      "parent_classes": "ot-tgl"
+    },
+    {
+      "index": 8,
+      "tag": "input",
+      "type": "checkbox",
+      "placeholder": "",
+      "name": "ot-group-id-C0009",
+      "id": "ot-group-id-C0009",
+      "class": "category-switch-handler",
+      "aria-label": "",
+      "parent_classes": "ot-tgl"
+    },
+    {
+      "index": 9,
+      "tag": "input",
+      "type": "text",
+      "placeholder": "Satıcıları arayın",
+      "name": "vendor-search-handler",
+      "id": "vendor-search-handler",
+      "class": "",
+      "aria-label": "Satıcı listesi araması",
+      "parent_classes": "ot-search-cntr"
+    },
+    {
+      "index": 10,
+      "tag": "input",
+      "type": "checkbox",
+      "placeholder": "",
+      "name": "",
+      "id": "chkbox-id",
+      "class": "category-filter-handler",
+      "aria-label": "",
+      "parent_classes": "ot-chkbox"
+    },
+    {
+      "index": 11,
+      "tag": "input",
+      "type": "checkbox",
+      "placeholder": "",
+      "name": "",
+      "id": "select-all-hosts-groups-handler",
+      "class": "",
+      "aria-label": "",
+      "parent_classes": "ot-chkbox"
+    },
+    {
+      "index": 12,
+      "tag": "input",
+      "type": "checkbox",
+      "placeholder": "",
+      "name": "",
+      "id": "select-all-vendor-groups-handler",
+      "class": "",
+      "aria-label": "",
+      "parent_classes": "ot-chkbox"
+    },
+    {
+      "index": 13,
+      "tag": "input",
+      "type": "checkbox",
+      "placeholder": "",
+      "name": "",
+      "id": "select-all-vendor-leg-handler",
+      "class": "",
+      "aria-label": "",
+      "parent_classes": "ot-chkbox"
+    },
+    {
+      "index": 14,
+      "tag": "input",
+      "type": "range",
+      "placeholder": "",
+      "name": "",
+      "id": "bluefilterRanger",
+      "class": "eyeAble_cc-rngr eyeAble_bluefilter-gradient-thumb",
+      "aria-label": "Mavi filtrenin yoğunluğu",
+      "parent_classes": "eyeAble_cc-ranger"
+    },
+    {
+      "index": 15,
+      "tag": "input",
+      "type": "range",
+      "placeholder": "",
+      "name": "",
+      "id": "colorblindRanger",
+      "class": "eyeAble_cc-rngr",
+      "aria-label": "Intensität des Farbschwächefilters",
+      "parent_classes": "eyeAble_cc-ranger"
+    }
+  ],
+  "all_buttons": [
+    {
+      "index": 0,
+      "text": "",
+      "id": "",
+      "class": "hamburger-menu navigation-menu-start-item",
+      "aria-label": "Menu",
+      "parent_classes": "main-navigation-start-wrapper"
+    },
+    {
+      "index": 1,
+      "text": "",
+      "id": "",
+      "class": "suggestion-placeholder-button",
+      "aria-label": "Open search",
+      "parent_classes": "suggestion-placeholder-wrapper"
+    },
+    {
+      "index": 2,
+      "text": "Ürün, kategori veya marka ara",
+      "id": "",
+      "class": "suggestion-placeholder",
+      "aria-label": "",
+      "parent_classes": "suggestion-placeholder-wrapper"
+    },
+    {
+      "index": 3,
+      "text": "Ürün Ekle & Uygula",
+      "id": "",
+      "class": "basket-top-coupon-action-button",
+      "aria-label": "",
+      "parent_classes": "right-wrapper-bottom"
+    },
+    {
+      "index": 4,
+      "text": "",
+      "id": "",
+      "class": "quantity-button quantity-button-disabled",
+      "aria-label": "Ürün adedi azaltma",
+      "parent_classes": "quantity-select-with-buttons"
+    },
+    {
+      "index": 5,
+      "text": "",
+      "id": "",
+      "class": "quantity-button",
+      "aria-label": "Ürün adedi arttırma",
+      "parent_classes": "quantity-select-with-buttons"
+    },
+    {
+      "index": 6,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "vertical-product-card-buttons"
+    },
+    {
+      "index": 7,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "vertical-product-card-buttons"
+    },
+    {
+      "index": 8,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "vertical-product-card-buttons"
+    },
+    {
+      "index": 9,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "vertical-product-card-buttons"
+    },
+    {
+      "index": 10,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "vertical-product-card-buttons"
+    },
+    {
+      "index": 11,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "vertical-product-card-buttons"
+    },
+    {
+      "index": 12,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "vertical-product-card-buttons"
+    },
+    {
+      "index": 13,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "vertical-product-card-buttons"
+    },
+    {
+      "index": 14,
+      "text": "",
+      "id": "",
+      "class": "react-multiple-carousel__arrow react-multiple-carousel__arrow--right ",
+      "aria-label": "Go to next slide",
+      "parent_classes": "react-multi-carousel-list  "
+    },
+    {
+      "index": 15,
+      "text": "Önceden Eklediklerim",
+      "id": "",
+      "class": "tab active",
+      "aria-label": "",
+      "parent_classes": "tab-header"
+    },
+    {
+      "index": 16,
+      "text": "Tekrar Satın Al",
+      "id": "",
+      "class": "tab",
+      "aria-label": "",
+      "parent_classes": "tab-header"
+    },
+    {
+      "index": 17,
+      "text": "Favorilerim",
+      "id": "",
+      "class": "tab",
+      "aria-label": "",
+      "parent_classes": "tab-header"
+    },
+    {
+      "index": 18,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 19,
+      "text": "",
+      "id": "",
+      "class": "delete-button",
+      "aria-label": "*remove_from_reco_list_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 20,
+      "text": "Sepete Ekle",
+      "id": "",
+      "class": "add-to-basket-button horizontal",
+      "aria-label": "",
+      "parent_classes": "horizontal-product-card-footer"
+    },
+    {
+      "index": 21,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 22,
+      "text": "",
+      "id": "",
+      "class": "delete-button",
+      "aria-label": "*remove_from_reco_list_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 23,
+      "text": "Sepete Ekle",
+      "id": "",
+      "class": "add-to-basket-button horizontal",
+      "aria-label": "",
+      "parent_classes": "horizontal-product-card-footer"
+    },
+    {
+      "index": 24,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 25,
+      "text": "",
+      "id": "",
+      "class": "delete-button",
+      "aria-label": "*remove_from_reco_list_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 26,
+      "text": "Sepete Ekle",
+      "id": "",
+      "class": "add-to-basket-button horizontal",
+      "aria-label": "",
+      "parent_classes": "horizontal-product-card-footer"
+    },
+    {
+      "index": 27,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 28,
+      "text": "",
+      "id": "",
+      "class": "delete-button",
+      "aria-label": "*remove_from_reco_list_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 29,
+      "text": "Sepete Ekle",
+      "id": "",
+      "class": "add-to-basket-button horizontal",
+      "aria-label": "",
+      "parent_classes": "horizontal-product-card-footer"
+    },
+    {
+      "index": 30,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 31,
+      "text": "",
+      "id": "",
+      "class": "delete-button",
+      "aria-label": "*remove_from_reco_list_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 32,
+      "text": "Sepete Ekle",
+      "id": "",
+      "class": "add-to-basket-button horizontal",
+      "aria-label": "",
+      "parent_classes": "horizontal-product-card-footer"
+    },
+    {
+      "index": 33,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 34,
+      "text": "",
+      "id": "",
+      "class": "delete-button",
+      "aria-label": "*remove_from_reco_list_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 35,
+      "text": "Sepete Ekle",
+      "id": "",
+      "class": "add-to-basket-button horizontal",
+      "aria-label": "",
+      "parent_classes": "horizontal-product-card-footer"
+    },
+    {
+      "index": 36,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 37,
+      "text": "",
+      "id": "",
+      "class": "delete-button",
+      "aria-label": "*remove_from_reco_list_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 38,
+      "text": "Sepete Ekle",
+      "id": "",
+      "class": "add-to-basket-button horizontal",
+      "aria-label": "",
+      "parent_classes": "horizontal-product-card-footer"
+    },
+    {
+      "index": 39,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 40,
+      "text": "",
+      "id": "",
+      "class": "delete-button",
+      "aria-label": "*remove_from_reco_list_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 41,
+      "text": "Sepete Ekle",
+      "id": "",
+      "class": "add-to-basket-button horizontal",
+      "aria-label": "",
+      "parent_classes": "horizontal-product-card-footer"
+    },
+    {
+      "index": 42,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 43,
+      "text": "",
+      "id": "",
+      "class": "delete-button",
+      "aria-label": "*remove_from_reco_list_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 44,
+      "text": "Sepete Ekle",
+      "id": "",
+      "class": "add-to-basket-button horizontal",
+      "aria-label": "",
+      "parent_classes": "horizontal-product-card-footer"
+    },
+    {
+      "index": 45,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 46,
+      "text": "",
+      "id": "",
+      "class": "delete-button",
+      "aria-label": "*remove_from_reco_list_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 47,
+      "text": "Sepete Ekle",
+      "id": "",
+      "class": "add-to-basket-button horizontal",
+      "aria-label": "",
+      "parent_classes": "horizontal-product-card-footer"
+    },
+    {
+      "index": 48,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 49,
+      "text": "",
+      "id": "",
+      "class": "delete-button",
+      "aria-label": "*remove_from_reco_list_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 50,
+      "text": "Sepete Ekle",
+      "id": "",
+      "class": "add-to-basket-button horizontal",
+      "aria-label": "",
+      "parent_classes": "horizontal-product-card-footer"
+    },
+    {
+      "index": 51,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 52,
+      "text": "",
+      "id": "",
+      "class": "delete-button",
+      "aria-label": "*remove_from_reco_list_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 53,
+      "text": "Sepete Ekle",
+      "id": "",
+      "class": "add-to-basket-button horizontal",
+      "aria-label": "",
+      "parent_classes": "horizontal-product-card-footer"
+    },
+    {
+      "index": 54,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 55,
+      "text": "",
+      "id": "",
+      "class": "delete-button",
+      "aria-label": "*remove_from_reco_list_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 56,
+      "text": "Sepete Ekle",
+      "id": "",
+      "class": "add-to-basket-button horizontal",
+      "aria-label": "",
+      "parent_classes": "horizontal-product-card-footer"
+    },
+    {
+      "index": 57,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 58,
+      "text": "",
+      "id": "",
+      "class": "delete-button",
+      "aria-label": "*remove_from_reco_list_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 59,
+      "text": "Sepete Ekle",
+      "id": "",
+      "class": "add-to-basket-button horizontal",
+      "aria-label": "",
+      "parent_classes": "horizontal-product-card-footer"
+    },
+    {
+      "index": 60,
+      "text": "",
+      "id": "",
+      "class": "add-remove-favorite-button",
+      "aria-label": "*add_to_favorites_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 61,
+      "text": "",
+      "id": "",
+      "class": "delete-button",
+      "aria-label": "*remove_from_reco_list_alt_text|tr|*",
+      "parent_classes": "horizontal-product-card-buttons"
+    },
+    {
+      "index": 62,
+      "text": "Sepete Ekle",
+      "id": "",
+      "class": "add-to-basket-button horizontal",
+      "aria-label": "",
+      "parent_classes": "horizontal-product-card-footer"
+    },
+    {
+      "index": 63,
+      "text": "İndirim Kodu Gir",
+      "id": "",
+      "class": "use-promotion-code-button",
+      "aria-label": "",
+      "parent_classes": ""
+    },
+    {
+      "index": 64,
+      "text": "Sepeti Onayla",
+      "id": "",
+      "class": "p-button-wrapper p-primary p-large p-fluid checkout-button",
+      "aria-label": "",
+      "parent_classes": "checkout-button-outer"
+    },
+    {
+      "index": 65,
+      "text": "",
+      "id": "close-pc-btn-handler",
+      "class": "ot-close-icon eyeAbleContrastSkip",
+      "aria-label": "Tercih merkezini kapat",
+      "parent_classes": "ot-pc-header"
+    },
+    {
+      "index": 66,
+      "text": "Tümüne İzin Ver",
+      "id": "accept-recommended-btn-handler",
+      "class": "",
+      "aria-label": "",
+      "parent_classes": "ot-pc-scrollbar"
+    },
+    {
+      "index": 67,
+      "text": "",
+      "id": "",
+      "class": "",
+      "aria-label": "",
+      "parent_classes": "ot-accordion-layout ot-cat-item ot-vs-config eyeAbleContrastSkip"
+    },
+    {
+      "index": 68,
+      "text": "Satıcı Ayrıntılarını Görüntüle‎",
+      "id": "",
+      "class": "ot-link-btn category-host-list-handler",
+      "aria-label": "Satıcı Ayrıntıları düğmesi Satıcı Listesi menüsünü açar",
+      "parent_classes": "ot-hlst-cntr"
+    },
+    {
+      "index": 69,
+      "text": "",
+      "id": "",
+      "class": "",
+      "aria-label": "",
+      "parent_classes": "ot-accordion-layout ot-cat-item ot-vs-config eyeAbleContrastSkip"
+    },
+    {
+      "index": 70,
+      "text": "Satıcı Ayrıntılarını Görüntüle‎",
+      "id": "",
+      "class": "ot-link-btn category-host-list-handler",
+      "aria-label": "Satıcı Ayrıntıları düğmesi Satıcı Listesi menüsünü açar",
+      "parent_classes": "ot-hlst-cntr"
+    },
+    {
+      "index": 71,
+      "text": "",
+      "id": "",
+      "class": "",
+      "aria-label": "",
+      "parent_classes": "ot-accordion-layout ot-cat-item ot-vs-config eyeAbleContrastSkip"
+    },
+    {
+      "index": 72,
+      "text": "Satıcı Ayrıntılarını Görüntüle‎",
+      "id": "",
+      "class": "ot-link-btn category-host-list-handler",
+      "aria-label": "Satıcı Ayrıntıları düğmesi Satıcı Listesi menüsünü açar",
+      "parent_classes": "ot-hlst-cntr"
+    },
+    {
+      "index": 73,
+      "text": "",
+      "id": "",
+      "class": "",
+      "aria-label": "",
+      "parent_classes": "ot-accordion-layout ot-cat-item ot-vs-config eyeAbleContrastSkip"
+    },
+    {
+      "index": 74,
+      "text": "Satıcı Ayrıntılarını Görüntüle‎",
+      "id": "",
+      "class": "ot-link-btn category-host-list-handler",
+      "aria-label": "Satıcı Ayrıntıları düğmesi Satıcı Listesi menüsünü açar",
+      "parent_classes": "ot-hlst-cntr"
+    },
+    {
+      "index": 75,
+      "text": "",
+      "id": "",
+      "class": "",
+      "aria-label": "",
+      "parent_classes": "ot-accordion-layout ot-cat-item ot-vs-config eyeAbleContrastSkip"
+    },
+    {
+      "index": 76,
+      "text": "Satıcı Ayrıntılarını Görüntüle‎",
+      "id": "",
+      "class": "ot-link-btn category-host-list-handler",
+      "aria-label": "Satıcı Ayrıntıları düğmesi Satıcı Listesi menüsünü açar",
+      "parent_classes": "ot-hlst-cntr"
+    },
+    {
+      "index": 77,
+      "text": "",
+      "id": "",
+      "class": "",
+      "aria-label": "",
+      "parent_classes": "ot-accordion-layout ot-cat-item ot-vs-config eyeAbleContrastSkip"
+    },
+    {
+      "index": 78,
+      "text": "Satıcı Ayrıntılarını Görüntüle‎",
+      "id": "",
+      "class": "ot-link-btn category-host-list-handler",
+      "aria-label": "Satıcı Ayrıntıları düğmesi Satıcı Listesi menüsünü açar",
+      "parent_classes": "ot-hlst-cntr"
+    },
+    {
+      "index": 79,
+      "text": "",
+      "id": "",
+      "class": "",
+      "aria-label": "",
+      "parent_classes": "ot-accordion-layout ot-cat-item ot-vs-config eyeAbleContrastSkip"
+    },
+    {
+      "index": 80,
+      "text": "Satıcı Ayrıntılarını Görüntüle‎",
+      "id": "",
+      "class": "ot-link-btn category-host-list-handler",
+      "aria-label": "Satıcı Ayrıntıları düğmesi Satıcı Listesi menüsünü açar",
+      "parent_classes": "ot-hlst-cntr"
+    },
+    {
+      "index": 81,
+      "text": "Back Button",
+      "id": "",
+      "class": "ot-link-btn back-btn-handler",
+      "aria-label": "Back",
+      "parent_classes": ""
+    },
+    {
+      "index": 82,
+      "text": "Filter Icon",
+      "id": "filter-btn-handler",
+      "class": "",
+      "aria-label": "Filter",
+      "parent_classes": "ot-fltr-cntr"
+    },
+    {
+      "index": 83,
+      "text": "Clear",
+      "id": "clear-filters-handler",
+      "class": "",
+      "aria-label": "",
+      "parent_classes": ""
+    },
+    {
+      "index": 84,
+      "text": "Apply",
+      "id": "filter-apply-handler",
+      "class": "",
+      "aria-label": "",
+      "parent_classes": "ot-fltr-btns"
+    },
+    {
+      "index": 85,
+      "text": "Cancel",
+      "id": "filter-cancel-handler",
+      "class": "",
+      "aria-label": "",
+      "parent_classes": "ot-fltr-btns"
+    },
+    {
+      "index": 86,
+      "text": "Seçimlerimi Onayla",
+      "id": "",
+      "class": "save-preference-btn-handler onetrust-close-btn-handler",
+      "aria-label": "",
+      "parent_classes": "ot-btn-container"
+    }
+  ]
+}

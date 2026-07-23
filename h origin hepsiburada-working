@@ -1,0 +1,451 @@
+[33mtag v0.1.0[m
+Tagger: Anıl Çınar <anil@example.com>
+Date:   Wed Jul 22 23:48:03 2026 +0300
+
+First working MVP: Hepsiburada + Trendyol + shared coupon classification
+
+[33mcommit a96b7b65966049ea9ef7dc5bf25559f0df020321[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mn11-development[m[33m, [m[1;33mtag: [m[1;33mv0.1.0[m[33m, [m[1;32mhepsiburada-working[m[33m)[m
+Author: Anıl Çınar <anil@example.com>
+Date:   Wed Jul 22 23:40:56 2026 +0300
+
+    feat: add shared coupon result classification
+
+[1mdiff --git a/app/adapters/hepsiburada_adapter.py b/app/adapters/hepsiburada_adapter.py[m
+[1mindex 282dd83..fb95c16 100644[m
+[1m--- a/app/adapters/hepsiburada_adapter.py[m
+[1m+++ b/app/adapters/hepsiburada_adapter.py[m
+[36m@@ -5,6 +5,7 @@[m [mfrom playwright.async_api import Page, TimeoutError[m
+ from app.adapters.base import BaseAdapter[m
+ from app.browser.browser_manager import BrowserManager[m
+ from app.platforms.hepsiburada import HOME_URL, CHECKOUT_URL, COUPON_INPUT_SELECTOR, APPLY_BUTTON_SELECTOR, RESULT_SELECTOR[m
+[32m+[m[32mfrom app.models.coupon_result import classify_hepsiburada_result, CouponStatus[m
+ [m
+ logger = logging.getLogger("adapters.hepsiburada")[m
+ [m
+[36m@@ -209,32 +210,57 @@[m [mclass HepsiburadaAdapter(BaseAdapter):[m
+                             "status": "invalid"[m
+                         }[m
+                     else:[m
+[31m-                        # Unrecognized toast result - preserve as submitted_unverified[m
+[31m-                        logger.info("Unrecognized Hepsiburada coupon result; leaving as submitted_unverified")[m
+[31m-                        return {[m
+[31m-                            "success": False,[m
+[31m-                            "message": toast_text,[m
+[31m-                            "coupon": coupon,[m
+[31m-                            "status": "submitted_unverified"[m
+[31m-                        }[m
+[32m+[m[32m                        # Unrecognized toast result - classify it using our new system[m
+[32m+[m[32m                        logger.info("Unrecognized Hepsiburada coupon result; classifying with new system")[m
+[32m+[m[32m                        classified_status = classify_hepsiburada_result(toast_text)[m
+[32m+[m[32m                        logger.info(f"[Hepsiburada] Raw result: \"{toast_text}\"")[m
+[32m+[m[32m                        logger.info(f"[Hepsiburada] Classification: {classified_status.value}")[m
+[32m+[m[41m                        [m
+[32m+[m[32m                        # Return the properly classified result[m
+[32m+[m[32m                        if classified_status == CouponStatus.SUCCESS:[m
+[32m+[m[32m                            return {[m
+[32m+[m[32m                                "success": True,[m
+[32m+[m[32m                                "message": toast_text,[m
+[32m+[m[32m                                "coupon": coupon,[m
+[32m+[m[32m                                "status": "success"[m
+[32m+[m[32m                            }[m
+[32m+[m[32m                        elif classified_status in [CouponStatus.INVALID, CouponStatus.ALREADY_USED,[m[41m [m
+[32m+[m[32m                                                  CouponStatus.EXPIRED, CouponStatus.MIN_CART]:[m
+[32m+[m[32m                            return {[m
+[32m+[m[32m                                "success": False,[m
+[32m+[m[32m                                "message": toast_text,[m
+[32m+[m[32m                                "coupon": coupon,[m
+[32m+[m[32m                                "status": classified_status.value.lower()[m
+[32m+[m[32m                            }[m
+[32m+[m[32m                        else:[m
+[32m+[m[32m                            # For unknown cases, return UNKNOWN status[m
+[32m+[m[32m                            logger.info("Unknown classification result; returning UNKNOWN")[m
+[32m+[m[32m                            return {[m
+[32m+[m[32m                                "success": False,[m
+[32m+[m[32m                                "message": toast_text,[m
+[32m+[m[32m                                "coupon": coupon,[m
+[32m+[m[32m                                "status": "unknown"[m
+[32m+[m[32m                            }[m
+                 else:[m
+                     # Toast exists but is not visible - treat as no result detected[m
+                     logger.info("No recognized Hepsiburada result detected after submission")[m
+[32m+[m[32m                    # Return UNKNOWN status for cases with no visible message[m
+                     return {[m
+                         "success": False,[m
+[31m-                        "message": "Coupon submitted for processing",[m
+[32m+[m[32m                        "message": "No visible message after submission",[m
+                         "coupon": coupon,[m
+[31m-                        "status": "submitted_unverified"[m
+[32m+[m[32m                        "status": "unknown"[m
+                     }[m
+                     [m
+             except Exception:[m
+                 # No toast appeared within timeout - treat as no result detected[m
+                 logger.info("No recognized Hepsiburada result detected after submission")[m
+[32m+[m[32m                # Return UNKNOWN status for cases with no visible message[m
+                 return {[m
+                     "success": False,[m
+[31m-                    "message": "Coupon submitted for processing",[m
+[32m+[m[32m                    "message": "No visible message after submission",[m
+                     "coupon": coupon,[m
+[31m-                    "status": "submitted_unverified"[m
+[32m+[m[32m                    "status": "unknown"[m
+                 }[m
+                 [m
+         except Exception as e:[m
+[1mdiff --git a/app/adapters/trendyol_adapter.py b/app/adapters/trendyol_adapter.py[m
+[1mindex 138557b..360fe47 100644[m
+[1m--- a/app/adapters/trendyol_adapter.py[m
+[1m+++ b/app/adapters/trendyol_adapter.py[m
+[36m@@ -6,6 +6,7 @@[m [mimport os[m
+ from app.adapters.base import BaseAdapter[m
+ from app.browser.browser_manager import BrowserManager[m
+ from app.platforms.trendyol import CART_URL, COUPON_INPUT_SELECTOR, APPLY_BUTTON_SELECTOR[m
+[32m+[m[32mfrom app.models.coupon_result import classify_trendyol_result, CouponStatus[m
+ [m
+ logger = logging.getLogger("adapters.trendyol")[m
+ [m
+[36m@@ -135,26 +136,132 @@[m [mclass TrendyolAdapter(BaseAdapter):[m
+             logger.info("Waiting for Trendyol coupon result")[m
+             await page.wait_for_timeout(2000)  # Give time for the result to show[m
+             [m
+[32m+[m[32m            # NEW: Check for modal first (priority 1)[m
+[32m+[m[32m            try:[m
+[32m+[m[32m                logger.info("Checking for promotion-code-modal")[m
+[32m+[m[32m                modal = page.locator(".modal-content.promotion-code-modal")[m
+[32m+[m[32m                await modal.wait_for(timeout=3000)  # Wait up to 3 seconds for modal[m
+[32m+[m[41m                [m
+[32m+[m[32m                if await modal.is_visible():[m
+[32m+[m[32m                    logger.info("Promotion code modal found")[m
+[32m+[m[32m                    # Extract title and body text[m
+[32m+[m[32m                    try:[m
+[32m+[m[32m                        title = ""[m
+[32m+[m[32m                        body = ""[m
+[32m+[m[41m                        [m
+[32m+[m[32m                        title_element = page.locator(".promotion-code-modal-content-title")[m
+[32m+[m[32m                        if await title_element.is_visible():[m
+[32m+[m[32m                            title = await title_element.inner_text()[m
+[32m+[m[32m                            logger.info(f"Modal title: {title}")[m
+[32m+[m[41m                        [m
+[32m+[m[32m                        body_element = page.locator(".promotion-code-modal-content-body")[m
+[32m+[m[32m                        if await body_element.is_visible():[m
+[32m+[m[32m                            body = await body_element.inner_text()[m
+[32m+[m[32m                            logger.info(f"Modal body: {body}")[m
+[32m+[m[41m                        [m
+[32m+[m[32m                        # Combine both texts[m
+[32m+[m[32m                        raw_result = (title + " " + body).strip()[m
+[32m+[m[32m                        if not raw_result:[m
+[32m+[m[32m                            raw_result = "No text in modal"[m
+[32m+[m[41m                            [m
+[32m+[m[32m                        logger.info(f"[Trendyol] Raw result: \"{raw_result}\"")[m
+[32m+[m[41m                        [m
+[32m+[m[32m                        # Classify the result[m
+[32m+[m[32m                        classified_status = classify_trendyol_result(raw_result)[m
+[32m+[m[32m                        logger.info(f"[Trendyol] Classification: {classified_status.value}")[m
+[32m+[m[41m                        [m
+[32m+[m[32m                        # Click the accept button to close the modal[m
+[32m+[m[32m                        try:[m
+[32m+[m[32m                            accept_button = page.locator(".promotion-code-modal-accept-button")[m
+[32m+[m[32m                            if await accept_button.is_visible():[m
+[32m+[m[32m                                await accept_button.click()[m
+[32m+[m[32m                                logger.info("Clicked modal accept button")[m
+[32m+[m[32m                        except Exception as e:[m
+[32m+[m[32m                            logger.warning(f"Could not click accept button: {e}")[m
+[32m+[m[41m                        [m
+[32m+[m[32m                        # Return classified result[m
+[32m+[m[32m                        if classified_status == CouponStatus.SUCCESS:[m
+[32m+[m[32m                            return {[m
+[32m+[m[32m                                "success": True,[m
+[32m+[m[32m                                "message": raw_result,[m
+[32m+[m[32m                                "coupon": coupon,[m
+[32m+[m[32m                                "status": "success"[m
+[32m+[m[32m                            }[m
+[32m+[m[32m                        elif classified_status in [CouponStatus.INVALID, CouponStatus.ALREADY_USED,[m[41m [m
+[32m+[m[32m                                                  CouponStatus.EXPIRED, CouponStatus.MIN_CART]:[m
+[32m+[m[32m                            return {[m
+[32m+[m[32m                                "success": False,[m
+[32m+[m[32m                                "message": raw_result,[m
+[32m+[m[32m                                "coupon": coupon,[m
+[32m+[m[32m                                "status": classified_status.value.lower()[m
+[32m+[m[32m                            }[m
+[32m+[m[32m                        else:[m
+[32m+[m[32m                            # For unknown cases, return UNKNOWN status[m
+[32m+[m[32m                            logger.info("Unknown classification result; returning UNKNOWN")[m
+[32m+[m[32m                            return {[m
+[32m+[m[32m                                "success": False,[m
+[32m+[m[32m                                "message": raw_result,[m
+[32m+[m[32m                                "coupon": coupon,[m
+[32m+[m[32m                                "status": "unknown"[m
+[32m+[m[32m                            }[m
+[32m+[m[32m                    except Exception as e:[m
+[32m+[m[32m                        logger.error(f"Error extracting modal text: {e}")[m
+[32m+[m[32m                        # Fall back to existing approach if we can't extract modal text[m
+[32m+[m[32m                        pass[m
+[32m+[m[32m                else:[m
+[32m+[m[32m                    logger.info("Promotion code modal not visible")[m
+[32m+[m[32m            except Exception:[m
+[32m+[m[32m                logger.info("No promotion-code-modal found within 3 seconds")[m
+[32m+[m[32m                # Continue with existing detection logic[m
+[32m+[m[41m            [m
+[32m+[m[32m            # OLD: Fall back to existing inline toast detection (priority 2)[m
+             # Get the text content of the apply button after submission to determine result[m
+             try:[m
+                 button_text = await apply_button.first.inner_text()[m
+                 if button_text and "uygula" in button_text.lower():[m
+                     logger.info("Coupon submitted successfully (apply button text unchanged)")[m
+[32m+[m[32m                    # No message appeared, so return UNKNOWN[m
+[32m+[m[32m                    logger.info("[Trendyol] Raw result: \"No visible message after submission\"")[m
+[32m+[m[32m                    logger.info("[Trendyol] Classification: UNKNOWN")[m
+                     return {[m
+[31m-                        "success": True,[m
+[31m-                        "message": "Coupon submitted for processing",[m
+[32m+[m[32m                        "success": False,[m
+[32m+[m[32m                        "message": "No visible message after submission",[m
+                         "coupon": coupon,[m
+[31m-                        "status": "submitted_unverified"[m
+[32m+[m[32m                        "status": "unknown"[m
+                     }[m
+                 else:[m
+                     # The button text changed, which indicates success or error[m
+                     logger.info(f"Coupon result: {button_text.strip()}")[m
+[31m-                    return {[m
+[31m-                        "success": True,[m
+[31m-                        "message": button_text.strip(),[m
+[31m-                        "coupon": coupon,[m
+[31m-                        "status": "success"  # Default to success for now, but this should be refined based on content[m
+[31m-                    }[m
+[32m+[m[32m                    # Classify using our new system[m
+[32m+[m[32m                    logger.info(f"[Trendyol] Raw result: \"{button_text.strip()}\"")[m
+[32m+[m[32m                    classified_status = classify_trendyol_result(button_text.strip())[m
+[32m+[m[32m                    logger.info(f"[Trendyol] Classification: {classified_status.value}")[m
+[32m+[m[41m                    [m
+[32m+[m[32m                    # Return the properly classified result with only required statuses[m
+[32m+[m[32m                    if classified_status == CouponStatus.SUCCESS:[m
+[32m+[m[32m                        return {[m
+[32m+[m[32m                            "success": True,[m
+[32m+[m[32m                            "message": button_text.strip(),[m
+[32m+[m[32m                            "coupon": coupon,[m
+[32m+[m[32m                            "status": "success"[m
+[32m+[m[32m                        }[m
+[32m+[m[32m                    elif classified_status in [CouponStatus.INVALID, CouponStatus.ALREADY_USED,[m[41m [m
+[32m+[m[32m                                              CouponStatus.EXPIRED, CouponStatus.MIN_CART]:[m
+[32m+[m[32m                        return {[m
+[32m+[m[32m                            "success": False,[m
+[32m+[m[32m                            "message": button_text.strip(),[m
+[32m+[m[32m                            "coupon": coupon,[m
+[32m+[m[32m                            "status": classified_status.value.lower()[m
+[32m+[m[32m                        }[m
+[32m+[m[32m                    else:[m
+[32m+[m[32m                        # For unknown cases, return UNKNOWN status[m
+[32m+[m[32m                        logger.info("Unknown classification result; returning UNKNOWN")[m
+[32m+[m[32m                        return {[m
+[32m+[m[32m                            "success": False,[m
+[32m+[m[32m                            "message": button_text.strip(),[m
+[32m+[m[32m                            "coupon": coupon,[m
+[32m+[m[32m                            "status": "unknown"[m
+[32m+[m[32m                        }[m
+             except Exception as e:[m
+                 logger.warning(f"Could not get button text after submission: {e}")[m
+                 # Try alternative approach to detect result by checking for error messages in page context[m
+[36m@@ -180,37 +287,21 @@[m [mclass TrendyolAdapter(BaseAdapter):[m
+                                             logger.info(f"Error message found: {error_text.strip()}")[m
+                                             # Classify based on content[m
+                                             normalized_text = error_text.strip().lower()[m
+[31m-                                            if "geçersiz" in normalized_text or "invalid" in normalized_text or \[m
+[31m-                                               "kupon kodu geçersiz" in normalized_text:[m
+[32m+[m[32m                                            # Classify using our new system[m
+[32m+[m[32m                                            logger.info(f"[Trendyol] Raw result: \"{error_text.strip()}\"")[m
+[32m+[m[32m                                            classified_status = classify_trendyol_result(error_text.strip())[m
+[32m+[m[32m                                            logger.info(f"[Trendyol] Classification: {classified_status.value}")[m
+[32m+[m[41m                                            [m
+[32m+[m[32m                                            if classified_status in [CouponStatus.INVALID, CouponStatus.ALREADY_USED,[m[41m [m
+[32m+[m[32m                                                                    CouponStatus.EXPIRED, CouponStatus.MIN_CART]:[m
+                                                 return {[m
+                                                     "success": False,[m
+                                                     "message": error_text.strip(),[m
+                                                     "coupon": coupon,[m
+[31m-                                                    "status": "invalid"[m
+[31m-                                                }[m
+[31m-                                            elif "süresi dolmuş" in normalized_text or "expired" in normalized_text:[m
+[31m-                                                return {[m
+[31m-                                                    "success": False,[m
+[31m-                                                    "message": error_text.strip(),[m
+[31m-                                                    "coupon": coupon,[m
+[31m-                                                    "status": "expired"[m
+[31m-                                                }[m
+[31m-                                            elif "kullanılmış" in normalized_text or "already used" in normalized_text:[m
+[31m-                                                return {[m
+[31m-                                                    "success": False,[m
+[31m-                                                    "message": error_text.strip(),[m
+[31m-                                                    "coupon": coupon,[m
+[31m-                                                    "status": "already_used"[m
+[31m-                                                }[m
+[31m-                                            elif "minimum" in normalized_text or "minumum" in normalized_text:[m
+[31m-                                                return {[m
+[31m-                                                    "success": False,[m
+[31m-                                                    "message": error_text.strip(),[m
+[31m-                                                    "coupon": coupon,[m
+[31m-                                                    "status": "minimum_cart"[m
+[32m+[m[32m                                                    "status": classified_status.value.lower()[m
+                                                 }[m
+                                             else:[m
+[31m-                                                # General error case[m
+[32m+[m[32m                                                # General error case - default to error status[m
+                                                 return {[m
+                                                     "success": False,[m
+                                                     "message": error_text.strip(),[m
+[36m@@ -221,19 +312,25 @@[m [mclass TrendyolAdapter(BaseAdapter):[m
+                             continue[m
+                     # If no error found, assume success since we submitted without errors[m
+                     logger.info("No specific error message detected, assuming submission was successful")[m
+[32m+[m[32m                    # Since there's no visible message, return UNKNOWN status[m[41m [m
+[32m+[m[32m                    logger.info("[Trendyol] Raw result: \"No visible message after submission\"")[m
+[32m+[m[32m                    logger.info("[Trendyol] Classification: UNKNOWN")[m
+                     return {[m
+[31m-                        "success": True,[m
+[31m-                        "message": "Coupon submitted for processing",[m
+[32m+[m[32m                        "success": False,[m
+[32m+[m[32m                        "message": "No visible message after submission",[m
+                         "coupon": coupon,[m
+[31m-                        "status": "submitted_unverified"[m
+[32m+[m[32m                        "status": "unknown"[m
+                     }[m
+                 except Exception as e2:[m
+                     logger.error(f"Failed to determine result after submission: {e2}")[m
+[32m+[m[32m                    # If we get here, no modal appeared and no toast was found - return UNKNOWN[m
+[32m+[m[32m                    logger.info("[Trendyol] Raw result: \"No visible message after submission\"")[m
+[32m+[m[32m                    logger.info("[Trendyol] Classification: UNKNOWN")[m
+                     return {[m
+                         "success": False,[m
+[31m-                        "message": f"Error determining result: {str(e2)}",[m
+[32m+[m[32m                        "message": "No visible message after submission",[m
+                         "coupon": coupon,[m
+[31m-                        "status": "error"[m
+[32m+[m[32m                        "status": "unknown"[m
+                     }[m
+ [m
+         except Exception as e:[m
+[1mdiff --git a/app/models/coupon_result.py b/app/models/coupon_result.py[m
+[1mnew file mode 100644[m
+[1mindex 0000000..086a61c[m
+[1m--- /dev/null[m
+[1m+++ b/app/models/coupon_result.py[m
+[36m@@ -0,0 +1,118 @@[m
+[32m+[m[32mimport enum[m
+[32m+[m[32mfrom typing import Optional[m
+[32m+[m[32mfrom pydantic import BaseModel[m
+[32m+[m
+[32m+[m
+[32m+[m[32mclass CouponStatus(str, enum.Enum):[m
+[32m+[m[32m    """Enumeration of coupon redemption statuses"""[m
+[32m+[m[32m    SUCCESS = "SUCCESS"[m
+[32m+[m[32m    INVALID = "INVALID"[m
+[32m+[m[32m    ALREADY_USED = "ALREADY_USED"[m
+[32m+[m[32m    EXPIRED = "EXPIRED"[m
+[32m+[m[32m    MIN_CART = "MIN_CART"[m
+[32m+[m[32m    UNKNOWN = "UNKNOWN"[m
+[32m+[m
+[32m+[m
+[32m+[m[32mclass CouponResult(BaseModel):[m
+[32m+[m[32m    """Model representing a coupon redemption result"""[m
+[32m+[m[32m    success: bool[m
+[32m+[m[32m    message: str[m
+[32m+[m[32m    coupon: str[m
+[32m+[m[32m    status: CouponStatus[m
+[32m+[m[41m    [m
+[32m+[m[32m    class Config:[m
+[32m+[m[32m        use_enum_values = True[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef classify_hepsiburada_result(raw_message: str) -> CouponStatus:[m
+[32m+[m[32m    """[m
+[32m+[m[32m    Classify Hepsiburada coupon redemption result into common statuses[m
+[32m+[m[41m    [m
+[32m+[m[32m    Args:[m
+[32m+[m[32m        raw_message: Raw message from Hepsiburada platform[m
+[32m+[m[41m        [m
+[32m+[m[32m    Returns:[m
+[32m+[m[32m        CouponStatus: Classified status[m
+[32m+[m[32m    """[m
+[32m+[m[32m    if not raw_message:[m
+[32m+[m[32m        return CouponStatus.UNKNOWN[m
+[32m+[m[41m    [m
+[32m+[m[32m    normalized_text = raw_message.strip().lower()[m
+[32m+[m[41m    [m
+[32m+[m[32m    # Mapping for Hepsiburada specific messages to common statuses[m
+[32m+[m[32m    classifications = {[m
+[32m+[m[32m        "kupon başarıyla uygulandı.": CouponStatus.SUCCESS,[m
+[32m+[m[32m        "bu kupon daha önce kullanıldı.": CouponStatus.ALREADY_USED,[m
+[32m+[m[32m        "kupon geçersiz.": CouponStatus.INVALID,[m
+[32m+[m[32m        "geçersiz bir kod girdin": CouponStatus.INVALID,[m
+[32m+[m[32m    }[m
+[32m+[m[41m    [m
+[32m+[m[32m    # Check for exact matches first[m
+[32m+[m[32m    if normalized_text in classifications:[m
+[32m+[m[32m        return classifications[normalized_text][m
+[32m+[m[41m    [m
+[32m+[m[32m    # Check for partial matches[m
+[32m+[m[32m    if "kupon başarıyla uygulandı" in normalized_text:[m
+[32m+[m[32m        return CouponStatus.SUCCESS[m
+[32m+[m[32m    elif "daha önce kullanıldı" in normalized_text:[m
+[32m+[m[32m        return CouponStatus.ALREADY_USED[m
+[32m+[m[32m    elif "geçersiz" in normalized_text:[m
+[32m+[m[32m        return CouponStatus.INVALID[m
+[32m+[m[32m    elif "süresi dolmuş" in normalized_text:[m
+[32m+[m[32m        return CouponStatus.EXPIRED[m
+[32m+[m[32m    elif "minimum sepet tutarı" in normalized_text:[m
+[32m+[m[32m        return CouponStatus.MIN_CART[m
+[32m+[m[41m    [m
+[32m+[m[32m    # Default case[m
+[32m+[m[32m    return CouponStatus.UNKNOWN[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef classify_trendyol_result(raw_message: str) -> CouponStatus:[m
+[32m+[m[32m    """[m
+[32m+[m[32m    Classify Trendyol coupon redemption result into common statuses[m
+[32m+[m[41m    [m
+[32m+[m[32m    Args:[m
+[32m+[m[32m        raw_message: Raw message from Trendyol platform[m
+[32m+[m[41m        [m
+[32m+[m[32m    Returns:[m
+[32m+[m[32m        CouponStatus: Classified status[m
+[32m+[m[32m    """[m
+[32m+[m[32m    if not raw_message:[m
+[32m+[m[32m        return CouponStatus.UNKNOWN[m
+[32m+[m[41m    [m
+[32m+[m[32m    # Normalize the text for comparison (lowercase, remove extra whitespace)[m
+[32m+[m[32m    normalized = raw_message.strip().lower()[m
+[32m+[m[41m    [m
+[32m+[m[32m    # Check for specific patterns in the normalized text[m
+[32m+[m[32m    if "başarıyla uygulandı" in normalized:[m
+[32m+[m[32m        return CouponStatus.SUCCESS[m
+[32m+[m[32m    elif "daha önce kullan" in normalized:[m
+[32m+[m[32m        return CouponStatus.ALREADY_USED[m
+[32m+[m[32m    elif "geçersiz" in normalized:[m
+[32m+[m[32m        return CouponStatus.INVALID[m
+[32m+[m[32m    elif "süresi dol" in normalized:[m
+[32m+[m[32m        return CouponStatus.EXPIRED[m
+[32m+[m[32m    elif "minimum sepet" in normalized:[m
+[32m+[m[32m        return CouponStatus.MIN_CART[m
+[32m+[m[32m    else:[m
+[32m+[m[32m        # Default to UNKNOWN for unrecognized results[m
+[32m+[m[32m        return CouponStatus.UNKNOWN[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef classify_result(raw_message: str, platform: str) -> CouponStatus:[m
+[32m+[m[32m    """[m
+[32m+[m[32m    Classify coupon result based on platform[m
+[32m+[m[41m    [m
+[32m+[m[32m    Args:[m
+[32m+[m[32m        raw_message: Raw message from platform[m
+[32m+[m[32m        platform: Platform name (hepsiburada or trendyol)[m
+[32m+[m[41m        [m
+[32m+[m[32m    Returns:[m
+[32m+[m[32m        CouponStatus: Classified status[m
+[32m+[m[32m    """[m
+[32m+[m[32m    if platform.lower() == "hepsiburada":[m
+[32m+[m[32m        return classify_hepsiburada_result(raw_message)[m
+[32m+[m[32m    elif platform.lower() == "trendyol":[m
+[32m+[m[32m        return classify_trendyol_result(raw_message)[m
+[32m+[m[32m    else:[m
+[32m+[m[32m        return CouponStatus.UNKNOWN[m
+\ No newline at end of file[m

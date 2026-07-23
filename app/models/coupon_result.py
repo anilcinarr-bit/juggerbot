@@ -99,13 +99,45 @@ def classify_trendyol_result(raw_message: str) -> CouponStatus:
         return CouponStatus.UNKNOWN
 
 
+def classify_n11_result(raw_message: str) -> CouponStatus:
+    """
+    Classify N11 coupon redemption result into common statuses
+    
+    Args:
+        raw_message: Raw message from N11 platform
+        
+    Returns:
+        CouponStatus: Classified status
+    """
+    if not raw_message:
+        return CouponStatus.UNKNOWN
+    
+    # Normalize the text for comparison (lowercase, remove extra whitespace)
+    normalized = raw_message.strip().lower()
+    
+    # Check for specific patterns in the normalized text
+    if "kupon başarıyla uygulandı" in normalized or "coupon applied successfully" in normalized:
+        return CouponStatus.SUCCESS
+    elif "daha önce kullanıldı" in normalized or "already used" in normalized:
+        return CouponStatus.ALREADY_USED
+    elif "geçersiz" in normalized or "invalid" in normalized:
+        return CouponStatus.INVALID
+    elif "süresi dolmuş" in normalized or "expired" in normalized:
+        return CouponStatus.EXPIRED
+    elif "minimum sepet tutarı" in normalized or "minimum cart amount" in normalized:
+        return CouponStatus.MIN_CART
+    else:
+        # Default to UNKNOWN for unrecognized results
+        return CouponStatus.UNKNOWN
+
+
 def classify_result(raw_message: str, platform: str) -> CouponStatus:
     """
     Classify coupon result based on platform
     
     Args:
         raw_message: Raw message from platform
-        platform: Platform name (hepsiburada or trendyol)
+        platform: Platform name (hepsiburada, trendyol or n11)
         
     Returns:
         CouponStatus: Classified status
@@ -114,5 +146,7 @@ def classify_result(raw_message: str, platform: str) -> CouponStatus:
         return classify_hepsiburada_result(raw_message)
     elif platform.lower() == "trendyol":
         return classify_trendyol_result(raw_message)
+    elif platform.lower() == "n11":
+        return classify_n11_result(raw_message)
     else:
         return CouponStatus.UNKNOWN

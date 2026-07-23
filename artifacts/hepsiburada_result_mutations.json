@@ -1,0 +1,40 @@
+[
+  {
+    "type": "childList",
+    "timestamp": 1784676637803,
+    "target": {
+      "tagName": "BODY",
+      "id": "",
+      "className": ""
+    },
+    "addedNodes": [
+      {
+        "tagName": "DIV",
+        "id": "",
+        "className": "hb-toast-notifier-container hb-toast-notifier-position-top-right",
+        "textContent": "\n            \n                \n                  \n    \n\n\n                \n                \n                  \n                        Geçersiz bir kod girdin. Lütfen tanımlı bir indirim kodu girin.\n                    \n                  \n                \n                \n    \n\n\n            \n        "
+      }
+    ],
+    "removedNodes": [],
+    "attributeName": null
+  },
+  {
+    "type": "childList",
+    "timestamp": 1784676637803,
+    "target": {
+      "tagName": "DIV",
+      "id": "",
+      "className": "hb-toast-notifier-container hb-toast-notifier-position-top-right"
+    },
+    "addedNodes": [
+      {
+        "tagName": "DIV",
+        "id": "",
+        "className": "hb-toast-notifier-box hb-toast-notifier-type-error show-toast-animate",
+        "textContent": "\n            \n                \n                  \n    \n\n\n                \n                \n                  \n                        Geçersiz bir kod girdin. Lütfen tanımlı bir indirim kodu girin.\n                    \n                  \n                \n                \n    \n\n\n            \n        "
+      }
+    ],
+    "removedNodes": [],
+    "attributeName": null
+  }
+]

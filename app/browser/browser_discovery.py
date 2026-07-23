@@ -13,6 +13,12 @@ def discover_browsers() -> List[Dict[str, Any]]:
     """
     browsers = []
     
+    # Log platform information for debugging
+    import sys
+    logger.info(f"Platform detection in browser discovery: {sys.platform}")
+    
+    # Get environment variables for path resolution
+    
     # Get environment variables for path resolution
     local_app_data = os.environ.get('LOCALAPPDATA', '')
     program_files = os.environ.get('PROGRAMFILES', '')

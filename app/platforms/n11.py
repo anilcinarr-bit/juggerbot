@@ -8,7 +8,7 @@ PLATFORM_NAME = "n11"
 # URLs
 HOME_URL = "https://www.n11.com"
 LOGIN_URL = "https://www.n11.com/login"
-CART_URL = "https://www.n11.com/sepet"
+CART_URL = "https://www.n11.com/sepetim"
 COUPON_PAGE_URL = "https://www.n11.com/kuponlar"
 CHECKOUT_URL = None
 

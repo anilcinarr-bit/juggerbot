@@ -29,6 +29,20 @@ app.include_router(routes_rules.router)
 app.include_router(routes_moderation.router)
 
 
+# Add a health endpoint to test browser functionality
+@app.get("/browser-health")
+async def browser_health() -> Dict[str, object]:
+    """Health check for browser manager"""
+    try:
+        # Check if browser is available 
+        if browser_manager.available:
+            return {"status": "ok", "browser_available": True}
+        else:
+            return {"status": "warning", "browser_available": False, "message": "Browser not available"}
+    except Exception as e:
+        return {"status": "error", "browser_available": False, "message": str(e)}
+
+
 @app.on_event("startup")
 async def on_startup() -> None:
     await init_db()
